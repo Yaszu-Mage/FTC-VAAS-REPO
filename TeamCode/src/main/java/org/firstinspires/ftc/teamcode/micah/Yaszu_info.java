@@ -23,7 +23,7 @@ public class Yaszu_info extends LinearOpMode {
     private Servo winston;
     public boolean jiamin = false;
     public boolean aidan = false;
-    private final int COOL_DOWN = 50;
+    private final int COOL_DOWN = 1;
     // Run OP mode please check documentation
     @Override
     public void runOpMode() throws InterruptedException {
@@ -57,7 +57,13 @@ public class Yaszu_info extends LinearOpMode {
                 telemetry.addData(">>", "Press start to continue");
             }
             // Checking if the Stick is being pressed
-            if (Math.abs(gamepad1.right_stick_x) > 0 || Math.abs(gamepad1.right_stick_y) > 0) {
+            if (gamepad1.dpad_up) {
+                LeftMotor.setPower(-1);
+                RightMotor.setPower(1);
+            }else if (gamepad1.dpad_down){
+                LeftMotor.setPower(1);
+                RightMotor.setPower(-1)
+            }else if (Math.abs(gamepad1.right_stick_x) > 0 || Math.abs(gamepad1.right_stick_y) > 0) {
                 if (Math.abs(gamepad1.right_stick_x) > Math.abs(gamepad1.right_stick_y)){
                     telemetry.addLine("Moving Left");
                     if (gamepad1.right_stick_x > 0) {
@@ -67,13 +73,9 @@ public class Yaszu_info extends LinearOpMode {
                         LeftMotor.setPower(gamepad1.right_stick_x);
                         RightMotor.setPower(gamepad1.right_stick_x);
                     }
-                }else{
-                    LeftMotor.setPower(-gamepad1.right_stick_y);
-                    RightMotor.setPower(gamepad1.right_stick_y);
-                }
             }else{
-                LeftMotor.setPower(0.0);
-                RightMotor.setPower(0.0);
+                LeftMotor.setPower(0);
+                RightMotor.setPower(0);
             }
             if (gamepad1.a) {
                 // check a bool and do things accordingly
