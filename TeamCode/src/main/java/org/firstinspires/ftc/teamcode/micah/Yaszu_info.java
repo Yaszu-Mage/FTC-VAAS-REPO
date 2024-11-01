@@ -14,7 +14,9 @@ import java.util.concurrent.TimeUnit;
 @TeleOp(name = "Yaszu Info")
 public class Yaszu_info extends LinearOpMode {
     // Declare Different Motors, Senses and other Variables
-    //Unimplemented Lines in Build - Line(s) 18, 32, 95-100
+    //Unimplemented Lines in Build - Line(s) 18, 32, 95-100, 34, 19
+    // Tinder^2 work im doing it I swear
+    private Servo Tinder;
     private Servo Upbringer;
     private final int READ_PERIOD = 1;
     private DcMotor LeftMotor;
@@ -26,9 +28,11 @@ public class Yaszu_info extends LinearOpMode {
     public boolean aidan = false;
     private final int COOL_DOWN = 1;
     // Run OP mode please check documentation
+    // Wait, im refering to gamepad1, is there just gamepad or do I have to duplicate code for multiple operators???
     @Override
     public void runOpMode() throws InterruptedException {
         //Actually Connecting Left Drive and Right Drive to correct Movement Class
+        Tinder = hardwareMap.get(Servo.class, "tinder");
         Upbringer = hardwareMap.get(Servo.class, "Upbringer");
         LeftMotor  = hardwareMap.get(DcMotor.class, "LeftDrive");
         RightMotor = hardwareMap.get(DcMotor.class, "RightDrive");
@@ -108,6 +112,7 @@ public class Yaszu_info extends LinearOpMode {
                 aidan = !aidan;
                 Cool.reset();
             }
+
             visual.selectAlgorithm(HuskyLens.Algorithm.FACE_RECOGNITION);
             telemetry.update();
             waitForStart();
