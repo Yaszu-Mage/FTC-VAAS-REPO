@@ -14,7 +14,8 @@ import java.util.concurrent.TimeUnit;
 @TeleOp(name = "Yaszu Info")
 public class Yaszu_info extends LinearOpMode {
     // Declare Different Motors, Senses and other Variables
-
+    //Unimplemented Lines in Build - Line(s) 18, 32, 95-100
+    private Servo Upbringer;
     private final int READ_PERIOD = 1;
     private DcMotor LeftMotor;
     private DcMotor RightMotor;
@@ -28,6 +29,7 @@ public class Yaszu_info extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         //Actually Connecting Left Drive and Right Drive to correct Movement Class
+        Upbringer = hardwareMap.get(Servo.class, "Upbringer");
         LeftMotor  = hardwareMap.get(DcMotor.class, "LeftDrive");
         RightMotor = hardwareMap.get(DcMotor.class, "RightDrive");
         servotest = hardwareMap.get(Servo.class, "servotest");
@@ -89,6 +91,13 @@ public class Yaszu_info extends LinearOpMode {
                 jiamin = !jiamin;
                 Cool.reset();
                 //flip bool
+            }
+            if (gamepad1.left_bumper || gamepad1.left_trigger) {
+                if (gamepad1.left_bumper) {
+                    Upbringer.setPosition(Upbringer.getPosition() + 180);
+                }else if (gamepad1.left_trigger) {
+                    Upbringer.setPosition(Upbringer.getPosition() - 180);
+                }
             }
             if (gamepad1.a) {
                 if (aidan) {
