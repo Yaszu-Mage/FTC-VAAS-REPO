@@ -42,7 +42,19 @@ public class MovescriptBeta extends LinearOpMode {
                 turn = turn / 2;
             }
             if (gamepad1.a) {
-                nick.setPosition
+                nick.setPosition(180);
+                if (gamepad1.a) {
+                    nick.setPosition(0);
+                }
+                }
+            if (gamepad1.b) {
+                winston.setPosition(180);
+                allison.setPosition(180);
+                if (gamepad1.b) {
+                    winston.setPosition(0);
+                    allison.setPosition(0);
+                }
+                }
             }
             double denominator = JavaUtil.maxOfList(JavaUtil.createListWith(1, Math.abs(forward + Math.abs(strafe) + Math.abs(turn))));
             leftFront.setPower((forward + strafe + turn) / denominator);
