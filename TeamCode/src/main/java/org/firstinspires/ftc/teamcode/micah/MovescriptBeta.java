@@ -4,12 +4,15 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 
 @TeleOp(name="Yaszu's Teleop")
 public class MovescriptBeta extends LinearOpMode {
     private final DcMotor leftFront, leftBack, rightFront, rightBack;
-
+    private Servo winston;
+    private Servo allison;
+    private Servo nick;
     public MovescriptBeta(DcMotor leftFront, DcMotor leftBack, DcMotor rightFront, DcMotor rightBack) {
         this.leftFront = leftFront;
         this.leftBack = leftBack;
@@ -26,7 +29,9 @@ public class MovescriptBeta extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-
+        nick = hardwareMap.get(Servo.class,"nick");
+        winston = hardwareMap.get(Servo.class, "winston");
+        allison = hardwareMap.get(Servo.class, "allison");
         while (opModeIsActive()){
             double forward = -gamepad1.left_stick_y;
             double strafe = gamepad1.left_stick_x;
@@ -35,6 +40,9 @@ public class MovescriptBeta extends LinearOpMode {
                 forward = forward / 2;
                 strafe = strafe / 2;
                 turn = turn / 2;
+            }
+            if (gamepad1.a) {
+                nick.setPosition
             }
             double denominator = JavaUtil.maxOfList(JavaUtil.createListWith(1, Math.abs(forward + Math.abs(strafe) + Math.abs(turn))));
             leftFront.setPower((forward + strafe + turn) / denominator);
