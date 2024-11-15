@@ -22,10 +22,10 @@ public class Autonomous extends LinearOpMode {
     private Servo servotest;
     private Servo winston;
     public final boolean neutral = false;
-    private Servo allison;
+    private CRServo allison;
     private CRServo rollerIntakeLeft;
     private CRServo rollerIntakeRight;
-    private Servo nick;
+    private CRServo nick;
     private final DcMotor leftFront, leftBack, rightFront, rightBack;
     public boolean alliance = false;
     // if red true if not red false
@@ -100,7 +100,6 @@ public class Autonomous extends LinearOpMode {
 //"&&" is supposedly the "and" statement
                             forward = 1.0;
                             allison.setPosition(180.0);
-                            winston.setPosition(-180.0);
                             nick.setPosition(0.0);
                            if (blocks[i].x >= 240 || blocks[i].x <= -240 && blocks[i].y >= 200 || blocks[i].y <= -240) {
                                 // cornered!!!
@@ -123,27 +122,23 @@ public class Autonomous extends LinearOpMode {
                         if (blocks[i].width >= 64 && blocks[i].height >= 64) {
 //"&&" is supposedly the "and" statement
                             forward = 1.0;
-                            allison.setPosition(180.0);
-                            winston.setPosition(-180.0);
-                            nick.setPosition(0.0);
                             if (blocks[i].x >= 240 || blocks[i].x <= -240 && blocks[i].y >= 200 || blocks[i].y <= -200) {
                                 if (blocks[i].x <= -240) {
                                     turn = -1;
                                 }else{
                                     turn = 1;
                                 }
-                                if (blocks[i].y <= -200) {
+                                if (blocks[i].y <= -200 && blocks[i].x <= -200  ) {
                                     //claw
-                                    rollerIntakeLeft.setPower(-1);
-                                    rollerIntakeRight.setPower(1);
+                                    nick.setPower(-1);
+                                    allison.setPower(1);
                                 } else if (blocks[i].y <= 200) {
                                     forward = 1;
                                 }
 
                             }
                         }else{
-
-                            //turn to it
+                            turn = 1
                         }
                     }
                 }
