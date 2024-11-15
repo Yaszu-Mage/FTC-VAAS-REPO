@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.micah;
 
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -20,7 +21,10 @@ public class Autonomous extends LinearOpMode {
     private HuskyLens visual;
     private Servo servotest;
     private Servo winston;
+    public final boolean neutral = false;
     private Servo allison;
+    private CRServo rollerIntakeLeft;
+    private CRServo rollerIntakeRight;
     private Servo nick;
     private final DcMotor leftFront, leftBack, rightFront, rightBack;
     public boolean alliance = false;
@@ -35,8 +39,11 @@ public class Autonomous extends LinearOpMode {
         this.rightBack = rightBack;
         leftFront = hardwareMap.get(DcMotorEx.class,"LeftDrive");
         rightFront = hardwareMap.get(DcMotorEx.class, "RightDrive");
+        rollerIntakeLeft = hardwareMap.get(CRServo.class, "rollerIntakeLeft");
+        rollerIntakeRight = hardwareMap.get(CRServo.class, "rollerIntakeRight");
         leftFront.setDirection(DcMotor.Direction.REVERSE);
         leftBack.setDirection(DcMotor.Direction.REVERSE);
+        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -71,24 +78,20 @@ public class Autonomous extends LinearOpMode {
             rateLimit.reset();
             if (physicscycle.hasExpired()) {
                 //thunk
-                if (alliance) {
-                    // set ignore blue true
-                }else{
-                    // set ignore red false
-                }
                 visual.selectAlgorithm(HuskyLens.Algorithm.OBJECT_RECOGNITION);
                 HuskyLens.Block[] blocks = visual.blocks();
                 telemetry.addLine("Physics Cycle expired!");
                 telemetry.addLine("Thinking...");
                 for (int i = 0; i < blocks.length; i++) {
                     telemetry.addLine(blocks[i].toString());
+                    // TODO finish autonomous - Micah
                     // should we use object classification first or should we use color recognitio
                     // either way code is the same
                     // I suggest object classification first so that we can use that as a base for color recognition
                     // Issue, how are we going to navigate it based on distance, it can recognize the object but not distance?
                     // Aidan look for documentation and put it here
                     //documents
-                    // documenation like this https://raw.githubusercontent.com/DFRobot/Wiki/master/SEN0305/res/HuskyLens%20WIKI%20Document.pdf
+                    // documention like this https://raw.githubusercontent.com/DFRobot/Wiki/master/SEN0305/res/HuskyLens%20WIKI%20Document.pdf
                     //https://github.com/google/ftc-object-detection somthing i found
                     // docs here
                     if (blocks[i].id == 1 && alliance) {
@@ -109,11 +112,38 @@ public class Autonomous extends LinearOpMode {
 
                             //turn to it
                         }
-                    } else if (blocks[i].id == 2 && !alliance) {
+                    } else if (blocks[i].id == 2 && !alliance && !neutral) {
                         //blue block
                         if (blocks[i].width > 64 && blocks[i].height > 64) {
                             forward = -1.0;
 
+
+                        } 
+                    } else if (blocks[i].id == 3 && neutral) {
+                        if (blocks[i].width >= 64 && blocks[i].height >= 64) {
+//"&&" is supposedly the "and" statement
+                            forward = 1.0;
+                            allison.setPosition(180.0);
+                            winston.setPosition(-180.0);
+                            nick.setPosition(0.0);
+                            if (blocks[i].x >= 240 || blocks[i].x <= -240 && blocks[i].y >= 200 || blocks[i].y <= -200) {
+                                if (blocks[i].x <= -240) {
+                                    turn = -1;
+                                }else{
+                                    turn = 1;
+                                }
+                                if (blocks[i].y <= -200) {
+                                    //claw
+                                    rollerIntakeLeft.setPower(-1);
+                                    rollerIntakeRight.setPower(1);
+                                } else if (blocks[i].y <= 200) {
+                                    forward = 1;
+                                }
+
+                            }
+                        }else{
+
+                            //turn to it
                         }
                     }
                 }
@@ -126,6 +156,7 @@ public class Autonomous extends LinearOpMode {
                 if (blocks[i].id == 1) {
                     telemetry.addLine("I'm seeing some "+ blocks[i].id + " in my vision...");               }
             } //reaction to seeing blocks
+
                 boolean slowed = false;
                 if (slowed) {
                     forward = forward / 2;
