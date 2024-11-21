@@ -63,21 +63,6 @@ public class Linear_recode extends LinearOpMode {
         telemetry.addLine("IM COMPARING");
         // Declares Output before function runs
         switch (Car_Lone) {
-            case Hang1:
-                neg_limit = hangvalues[2];
-                telemetry.addLine("COMPARING HANG 1");
-                if (linear_pos < neg_limit) {
-                // check what direction joy stick is going
-                    if (gamepad2.right_stick_x > 0 && linear_pos < pos_limit) {
-                        output = true;
-                        telemetry.addLine("ALL CONDITIONS MET - 1");
-                    } else {
-                        output = false;
-                        telemetry.addLine("NOT MOVING");
-                    }
-
-                    // if lin pos is less than equal to limit it runs func to check if it moves or not
-            }
                 // Executed if Case is Hang 1
 
             case Hang2:
@@ -97,6 +82,37 @@ public class Linear_recode extends LinearOpMode {
                 } else if (round(gamepad2.right_stick_x) >= -0.1 && neg_limit < linear_pos) {
                     output = true;
                     testslide.setTargetPosition(-1457);
+
+                }else if (round(gamepad2.right_stick_x) == 0 || neg_limit > linear_pos || pos_limit < linear_pos){
+                    output = false;
+                    testslide.setTargetPosition(testslide.getCurrentPosition());
+                }
+
+                telemetry.addData("Output: ", output);
+                telemetry.addData("Linear Pos: ", linear_pos);
+                telemetry.addData("Negative Limit", neg_limit);
+                telemetry.addData("Positive Limit", pos_limit);
+                telemetry.addData("LIMIT: ", testslide.getTargetPosition());
+                return output;
+
+
+         case Hang1:
+                // Executed if Case is Hang 1
+                telemetry.addLine("HANG 1");
+                neg_limit = hangvalues[2];
+
+                /*
+                Move = Recieves input at 1 or -1 within limits
+                Move if Input = 1 and poslimit > linearpos
+                Move if Input = -1 and neglimit < linear pos
+                 */
+                    // if lin pos is less than equal to limit it runs func to check if it moves or not
+                if (round(gamepad2.right_stick_x) <= 0.1 &&  pos_limit > linear_pos) {
+                    output = true;
+                    testslide.setTargetPosition(0);
+                } else if (round(gamepad2.right_stick_x) >= -0.1 && neg_limit < linear_pos) {
+                    output = true;
+                    testslide.setTargetPosition(0);
 
                 }else if (round(gamepad2.right_stick_x) == 0 || neg_limit > linear_pos || pos_limit < linear_pos){
                     output = false;
@@ -207,6 +223,10 @@ public class Linear_recode extends LinearOpMode {
                 forward = forward / 2;
                 strafe = strafe / 2;
                 turn = turn / 2;
+            } else if (gamepad2.a) {
+                Car_Lone = Extend_Preference.Hang1;
+            } else if (gamepad2.b) {
+                Car_Lone = Extend_Preference.Hang2;
             }
             telemetry.addData("TestSlide",testslide.getCurrentPosition());
             denominator = JavaUtil.maxOfList(JavaUtil.createListWith(1, Math.abs(forward) + strafe + turn));
