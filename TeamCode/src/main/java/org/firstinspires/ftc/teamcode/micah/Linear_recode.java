@@ -46,6 +46,11 @@ public class Linear_recode extends LinearOpMode {
         }
         return output;
     }
+    // Boolean function runs every time bool is checked
+    // output = true it moves , while output = false it doesnt.
+    // checks array for stop values, rightstop value is always 0
+    // check enums
+    // check array "hangvalues"
     public boolean Canextendlinear() {
         boolean output = false;
         telemetry.addLine("Checking extendation linear");
