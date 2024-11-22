@@ -20,15 +20,17 @@ public class Linear_recode extends LinearOpMode {
     private DcMotor backLeft;
     private CRServo rollerIntakeLeft;
     private CRServo rollerIntakeRight;
-    public Extend_Preference Car_Lone = Extend_Preference.Hang2;
+    public Extend_Preference Car_Lone = Extend_Preference.Dropoff2;
     // Boolean to determine if you can extend, found this out during pep rally
     public enum Extend_Preference {
-        Hang1,
-        Hang2,
+        Dropoff1,
+        Dropoff2,
     }
     //array for max values for each setting
 
-    public int[] hangvalues = {328,358,0,1403,1408,-1357};
+    public int[] hangvalues = {328,358,0,1403,1408,-1357}; // this represents an integer series
+    // hangvalues [0] = 328 or the first number, then hangvalue [1] would be 358, or second number.
+
     public boolean Sticking_it_X() {
         boolean output = false;
         if (gamepad2.right_stick_x > 0 || gamepad2.right_stick_x < 0){
@@ -57,7 +59,6 @@ public class Linear_recode extends LinearOpMode {
     public boolean Canextendlinear() {
         boolean output = false;
         double linear_pos = testslide.getCurrentPosition();
-        //ACHILLIES IM A FUCKING IDIOT CHECK LINE 59 IT WAS LINEAR SLIDE NOT TEST SLIDE...
         double pos_limit = 0;
         int neg_limit;
         telemetry.addLine("IM COMPARING");
@@ -65,7 +66,7 @@ public class Linear_recode extends LinearOpMode {
         switch (Car_Lone) {
                 // Executed if Case is Hang 1
 
-            case Hang2:
+            case Dropoff2:
                 // Executed if Case is Hang 2
                 telemetry.addLine("HANG 2");
                 neg_limit = hangvalues[5];
@@ -96,11 +97,11 @@ public class Linear_recode extends LinearOpMode {
                 return output;
 
 
-         case Hang1:
+         case Dropoff1:
                 // Executed if Case is Hang 1
                 telemetry.addLine("HANG 1");
-                neg_limit = hangvalues[2];
-
+                neg_limit = 0;
+                pos_limit = 0;
                 /*
                 Move = Recieves input at 1 or -1 within limits
                 Move if Input = 1 and poslimit > linearpos
@@ -132,44 +133,134 @@ public class Linear_recode extends LinearOpMode {
         return output;
 
     }
-
+// meow :3
 
 
 
     public boolean Canextendright() {
+        // moves entire arm including viper slide
         boolean output = false;
+        int pos_limit = 358;
+        int neg_limit = 0;
+        double linear_pos = armLiftRight.getCurrentPosition();
         switch (Car_Lone) {
-            case Hang1:
-                if (armLiftRight.getCurrentPosition() <= hangvalues[1]) {
+            case Dropoff1:
+                telemetry.addLine("HANG 1");
+                neg_limit = 0;
+                pos_limit = 358;
+                /*
+                Move = Recieves input at 1 or -1 within limits
+                Move if Input = 1 and poslimit > linearpos
+                Move if Input = -1 and neglimit < linear pos
+                 */
+                // if lin pos is less than equal to limit it runs func to check if it moves or not
+                if (round(gamepad2.right_stick_x) <= 0.1 &&  pos_limit > linear_pos) {
                     output = true;
-                }else {
-                    output = false;
-                }
-            case Hang2:
-                if (armLiftLeft.getCurrentPosition() <= hangvalues[4]) {
+                    armLiftRight.setTargetPosition(358);
+                    telemetry.addLine("setting positive target position");
+                } else if (round(gamepad2.right_stick_x) >= -0.1 && neg_limit < linear_pos) {
                     output = true;
-                }else {
+                    armLiftRight.setTargetPosition(0);
+                    telemetry.addLine("going back to zero");
+                }else if (round(gamepad2.right_stick_x) == 0 || neg_limit > linear_pos || pos_limit < linear_pos){
                     output = false;
+                    armLiftRight.setTargetPosition(armLiftRight.getCurrentPosition());
+                    telemetry.addLine("not moving");
                 }
+
+                telemetry.addData("Output: ", output);
+                telemetry.addData("Linear Pos: ", linear_pos);
+                telemetry.addData("Negative Limit", neg_limit);
+                telemetry.addData("Positive Limit", pos_limit);
+                telemetry.addData("LIMIT: ", armLiftRight.getTargetPosition());
+                return output;
+            case Dropoff2:
+                telemetry.addLine("HANG 2");
+                neg_limit = 0;
+                pos_limit = 1408;
+                /*
+                Move = Receives input at 1 or -1 within limits
+                Move if Input = 1 and poslimit > linearpos
+                Move if Input = -1 and neglimit < linear pos
+                 */
+                // if lin pos is less than equal to limit it runs func to check if it moves or not
+                if (round(gamepad2.right_stick_x) <= 0.1 &&  pos_limit > linear_pos) {
+                    output = true;
+                    armLiftRight.setTargetPosition(1408);
+                    telemetry.addLine("going to right target position");
+                } else if (round(gamepad2.right_stick_x) >= -0.1 && neg_limit < linear_pos) {
+                    output = true;
+                    armLiftRight.setTargetPosition(0);
+                    telemetry.addLine("going to right zero position");
+                }else if (round(gamepad2.right_stick_x) == 0 || neg_limit > linear_pos || pos_limit < linear_pos){
+                    output = false;
+                    armLiftRight.setTargetPosition(armLiftRight.getCurrentPosition());
+                }
+
+                telemetry.addData("Output: ", output);
+                telemetry.addData("Linear Pos: ", linear_pos);
+                telemetry.addData("Negative Limit", neg_limit);
+                telemetry.addData("Positive Limit", pos_limit);
+                telemetry.addData("LIMIT: ", armLiftRight.getTargetPosition());
+                return output;
         }
         return output;
     }
     //328,358
     public boolean Canextendleft() {
         boolean output = false;
+        int pos_limit = 328;
+        int neg_limit = 0;
+        double linear_pos = armLiftLeft.getCurrentPosition();
         switch (Car_Lone) {
-            case Hang1:
-                if (armLiftLeft.getCurrentPosition() <= hangvalues[0]) {
+            case Dropoff1:
+                telemetry.addLine("HANG 1");
+                neg_limit = 0;
+                pos_limit = 358;
+                /*
+                Move = Receives input at 1 or -1 within limits
+                Move if Input = 1 and poslimit > linearpos
+                Move if Input = -1 and neglimit < linear pos
+                 */
+                // if lin pos is less than equal to limit it runs func to check if it moves or not
+                if (round(gamepad2.right_stick_x) <= 0.1 &&  pos_limit > linear_pos) {
                     output = true;
-                }else {
-                    output = false;
-                }
-            case Hang2:
-                if (armLiftLeft.getCurrentPosition() <= hangvalues[3]) {
+                    armLiftLeft.setTargetPosition(328);
+                    telemetry.addLine("moving to left position");
+                } else if (round(gamepad2.right_stick_x) >= -0.1 && neg_limit < linear_pos) {
                     output = true;
-                }else {
+                    armLiftLeft.setTargetPosition(0);
+                    telemetry.addLine("moving to zero left position");
+                }else if (round(gamepad2.right_stick_x) == 0 || neg_limit > linear_pos || pos_limit < linear_pos){
                     output = false;
+                    armLiftLeft.setTargetPosition(armLiftLeft.getCurrentPosition());
+                    telemetry.addLine("freezing");
                 }
+
+                return output;
+            case Dropoff2:
+                telemetry.addLine("HANG 2");
+                neg_limit = 0;
+                pos_limit = 1408;
+                /*
+                Move = Receives input at 1 or -1 within limits
+                Move if Input = 1 and poslimit > linearpos
+                Move if Input = -1 and neglimit < linear pos
+                 */
+                // if lin pos is less than equal to limit it runs func to check if it moves or not
+                if (round(gamepad2.right_stick_x) <= 0.1 &&  pos_limit > linear_pos) {
+                    output = true;
+                    armLiftLeft.setTargetPosition(1408);
+                } else if (round(gamepad2.right_stick_x) >= -0.1 && neg_limit < linear_pos) {
+                    output = true;
+                    armLiftLeft.setTargetPosition(0);
+
+                }else if (round(gamepad2.right_stick_x) == 0 || neg_limit > linear_pos || pos_limit < linear_pos){
+                    output = false;
+                    armLiftLeft.setTargetPosition(armLiftLeft.getCurrentPosition());
+                }
+
+                return output;
         }
         return output;
     }
@@ -204,14 +295,20 @@ public class Linear_recode extends LinearOpMode {
         ((DcMotorEx) armLiftLeft).setVelocityPIDFCoefficients(1.17, 0.117, 0, 11.7);
         ((DcMotorEx) armLiftRight).setVelocityPIDFCoefficients(1.17, 0.117, 0, 11.7);
         testslide.setTargetPosition(0);
+        armLiftRight.setTargetPosition(0);
+        armLiftLeft.setTargetPosition(0);
+        armLiftLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        armLiftRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         testslide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         testslide.setPower(1);
+        armLiftRight.setPower(1);
+        armLiftLeft.setPower(1);
         waitForStart();
         while (opModeIsActive()){
             if (gamepad2.a) {
-                Car_Lone = Extend_Preference.Hang1;
+                Car_Lone = Extend_Preference.Dropoff1;
             } else if (gamepad2.b) {
-                Car_Lone = Extend_Preference.Hang2;
+                Car_Lone = Extend_Preference.Dropoff2;
             }
             // Movement Start
             telemetry.update();
@@ -224,9 +321,9 @@ public class Linear_recode extends LinearOpMode {
                 strafe = strafe / 2;
                 turn = turn / 2;
             } else if (gamepad2.a) {
-                Car_Lone = Extend_Preference.Hang1;
+                Car_Lone = Extend_Preference.Dropoff1;
             } else if (gamepad2.b) {
-                Car_Lone = Extend_Preference.Hang2;
+                Car_Lone = Extend_Preference.Dropoff2;
             }
             telemetry.addData("TestSlide",testslide.getCurrentPosition());
             denominator = JavaUtil.maxOfList(JavaUtil.createListWith(1, Math.abs(forward) + strafe + turn));
@@ -246,14 +343,21 @@ public class Linear_recode extends LinearOpMode {
             }else {
                 testslide.setPower(0);
             }
-            if (Sticking_it_X()) {
-                if (Canextendleft() && gamepad2.left_stick_x != 0 || Canextendright()  && gamepad2.left_stick_x != 0) {
+            if (Sticking_it_Y()) {
+                if (Canextendleft() && gamepad2.left_stick_x != 0){
+                    armLiftLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    armLiftLeft.setPower(gamepad2.left_stick_x);
+                }
 
-                } else {
-
+            }else {
+                armLiftLeft.setPower(0);
+            }}
+            if (Sticking_it_Y()) {
+                if (Canextendright() && gamepad2.left_stick_x != 0){
+                    armLiftRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    armLiftRight.setPower(gamepad2.left_stick_x);
                 }
             }
-        }
         telemetry.update();
         // Movement end
         // Claw Start
