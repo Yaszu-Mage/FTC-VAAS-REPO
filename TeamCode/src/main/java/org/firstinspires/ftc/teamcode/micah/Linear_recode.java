@@ -235,7 +235,7 @@ public class Linear_recode extends LinearOpMode {
                     {
                         int error = target - armLiftLeft.getCurrentPosition();
                         // find what our Kp value will be through testing
-                        armLiftLeft.setPower(Range.clip(error*Kp, -1.0, 1.0));
+                        armLiftLeft.setPower(Range.clip(error*2, -1.0, 1.0));
                         onTarget = Math.abs(error) <= tolerance;
                     }
                     armLiftLeft.setPower(1);
