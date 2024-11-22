@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.micah;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.*;
+import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 
 import static java.lang.Math.round;
@@ -145,7 +146,7 @@ public class Linear_recode extends LinearOpMode {
         double linear_pos = armLiftRight.getCurrentPosition();
         switch (Car_Lone) {
             case Dropoff1:
-                telemetry.addLine("HANG 1");
+                telemetry.addLine("DROPOFF 1");
                 neg_limit = 0;
                 pos_limit = 358;
                 /*
@@ -175,7 +176,7 @@ public class Linear_recode extends LinearOpMode {
                 telemetry.addData("LIMIT: ", armLiftRight.getTargetPosition());
                 return output;
             case Dropoff2:
-                telemetry.addLine("HANG 2");
+                telemetry.addLine("DROPOFF 2");
                 neg_limit = 0;
                 pos_limit = 1408;
                 /*
@@ -211,10 +212,13 @@ public class Linear_recode extends LinearOpMode {
         boolean output = false;
         int pos_limit = 328;
         int neg_limit = 0;
+        int tolerance = 2;
+        int target = 358;
+        boolean onTarget = false;
         double linear_pos = armLiftLeft.getCurrentPosition();
         switch (Car_Lone) {
             case Dropoff1:
-                telemetry.addLine("HANG 1");
+                telemetry.addLine("DROPOFF 1");
                 neg_limit = 0;
                 pos_limit = 358;
                 /*
@@ -225,6 +229,16 @@ public class Linear_recode extends LinearOpMode {
                 // if lin pos is less than equal to limit it runs func to check if it moves or not
                 if (round(gamepad2.right_stick_x) <= 0.1 &&  pos_limit > linear_pos) {
                     output = true;
+                    // implementing PID code to see if it works. at time of writing driver hub is dead and cant test
+                    armLiftLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    while (!onTarget)
+                    {
+                        int error = target - armLiftLeft.getCurrentPosition();
+                        // find what our Kp value will be through testing
+                        armLiftLeft.setPower(Range.clip(error*Kp, -1.0, 1.0));
+                        onTarget = Math.abs(error) <= tolerance;
+                    }
+                    armLiftLeft.setPower(1);
                     armLiftLeft.setTargetPosition(328);
                     telemetry.addLine("moving to left position");
                 } else if (round(gamepad2.right_stick_x) >= -0.1 && neg_limit < linear_pos) {
@@ -239,7 +253,7 @@ public class Linear_recode extends LinearOpMode {
 
                 return output;
             case Dropoff2:
-                telemetry.addLine("HANG 2");
+                telemetry.addLine("DROPOFF 2");
                 neg_limit = 0;
                 pos_limit = 1408;
                 /*
