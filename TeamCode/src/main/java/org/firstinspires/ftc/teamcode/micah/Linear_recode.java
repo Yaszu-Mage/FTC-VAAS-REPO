@@ -22,19 +22,27 @@ public class Linear_recode extends LinearOpMode {
     private CRServo rollerIntakeLeft;
     private CRServo rollerIntakeRight;
     public Extend_Preference Car_Lone = Extend_Preference.Dropoff2;
+    public Whichextend prop = Whichextend.Both;
+
+
     // Boolean to determine if you can extend, found this out during pep rally
     public enum Extend_Preference {
         Dropoff1,
         Dropoff2,
     }
+    public enum Whichextend {
+        Leftonly,
+        Rightonly,
+        Both,
+    }
     //array for max values for each setting
 
-    public int[] hangvalues = {328,358,0,1403,1408,-1357}; // this represents an integer series
+    public int[] hangvalues = {328, 358, 0, 1403, 1408, -1357}; // this represents an integer series
     // hangvalues [0] = 328 or the first number, then hangvalue [1] would be 358, or second number.
 
     public boolean Sticking_it_X() {
         boolean output = false;
-        if (gamepad2.right_stick_x > 0 || gamepad2.right_stick_x < 0){
+        if (gamepad2.right_stick_x > 0 || gamepad2.right_stick_x < 0) {
             output = true;
         }
         if (gamepad2.right_stick_y > 0 || gamepad2.right_stick_y < 0) {
@@ -42,6 +50,7 @@ public class Linear_recode extends LinearOpMode {
         }
         return output;
     }
+
     public boolean Sticking_it_Y() {
         boolean output = false;
         if (gamepad2.left_stick_x > 0 || gamepad2.left_stick_x < 0) {
@@ -52,6 +61,7 @@ public class Linear_recode extends LinearOpMode {
         }
         return output;
     }
+
     // Boolean function runs every time bool is checked
     // output = true it moves , while output = false it doesnt.
     // checks array for stop values, rightstop value is always 0
@@ -65,7 +75,7 @@ public class Linear_recode extends LinearOpMode {
         telemetry.addLine("IM COMPARING");
         // Declares Output before function runs
         switch (Car_Lone) {
-                // Executed if Case is Hang 1
+            // Executed if Case is Hang 1
 
             case Dropoff2:
                 // Executed if Case is Hang 2
@@ -77,7 +87,7 @@ public class Linear_recode extends LinearOpMode {
                 Move if Input = 1 and poslimit > linearpos
                 Move if Input = -1 and neglimit < linear pos
                  */
-                    // if lin pos is less than equal to limit it runs func to check if it moves or not
+                // if lin pos is less than equal to limit it runs func to check if it moves or not
                 if (round(gamepad2.right_stick_x) <= 0.1 &&  pos_limit > linear_pos) {
                     output = true;
                     testslide.setTargetPosition(0);
@@ -98,7 +108,7 @@ public class Linear_recode extends LinearOpMode {
                 return output;
 
 
-         case Dropoff1:
+            case Dropoff1:
                 // Executed if Case is Hang 1
                 telemetry.addLine("HANG 1");
                 neg_limit = 0;
@@ -108,7 +118,7 @@ public class Linear_recode extends LinearOpMode {
                 Move if Input = 1 and poslimit > linearpos
                 Move if Input = -1 and neglimit < linear pos
                  */
-                    // if lin pos is less than equal to limit it runs func to check if it moves or not
+                // if lin pos is less than equal to limit it runs func to check if it moves or not
                 if (round(gamepad2.right_stick_x) <= 0.1 &&  pos_limit > linear_pos) {
                     output = true;
                     testslide.setTargetPosition(0);
@@ -137,7 +147,6 @@ public class Linear_recode extends LinearOpMode {
 // meow :3
 
 
-
     public boolean Canextendright() {
         // moves entire arm including viper slide
         boolean output = false;
@@ -155,7 +164,7 @@ public class Linear_recode extends LinearOpMode {
                 Move if Input = -1 and neglimit < linear pos
                  */
                 // if lin pos is less than equal to limit it runs func to check if it moves or not
-                if (round(gamepad2.right_stick_x) <= 0.1 &&  pos_limit > linear_pos) {
+                if (round(gamepad2.right_stick_x) <= 0.1 && pos_limit > linear_pos) {
                     output = true;
                     armLiftRight.setTargetPosition(358);
                     telemetry.addLine("setting positive target position");
@@ -163,7 +172,7 @@ public class Linear_recode extends LinearOpMode {
                     output = true;
                     armLiftRight.setTargetPosition(0);
                     telemetry.addLine("going back to zero");
-                }else if (round(gamepad2.right_stick_x) == 0 || neg_limit > linear_pos || pos_limit < linear_pos){
+                } else if (round(gamepad2.right_stick_x) == 0 || neg_limit > linear_pos || pos_limit < linear_pos) {
                     output = false;
                     armLiftRight.setTargetPosition(armLiftRight.getCurrentPosition());
                     telemetry.addLine("not moving");
@@ -185,28 +194,24 @@ public class Linear_recode extends LinearOpMode {
                 Move if Input = -1 and neglimit < linear pos
                  */
                 // if lin pos is less than equal to limit it runs func to check if it moves or not
-                if (round(gamepad2.right_stick_x) <= 0.1 &&  pos_limit > linear_pos) {
+                if (round(gamepad2.left_stick_x) >= 0.1 && pos_limit > linear_pos) {
                     output = true;
                     armLiftRight.setTargetPosition(1408);
-                    telemetry.addLine("going to right target position");
-                } else if (round(gamepad2.right_stick_x) >= -0.1 && neg_limit < linear_pos) {
+                } else if (round(gamepad2.left_stick_x) <= -0.1 && neg_limit < linear_pos) {
+                    telemetry.addLine("Right-Neg-Function");
                     output = true;
                     armLiftRight.setTargetPosition(0);
-                    telemetry.addLine("going to right zero position");
-                }else if (round(gamepad2.right_stick_x) == 0 || neg_limit > linear_pos || pos_limit < linear_pos){
+
+                } else if (round(gamepad2.left_stick_x) == 0 || neg_limit > linear_pos || pos_limit < linear_pos) {
                     output = false;
                     armLiftRight.setTargetPosition(armLiftRight.getCurrentPosition());
                 }
 
-                telemetry.addData("Output: ", output);
-                telemetry.addData("Linear Pos: ", linear_pos);
-                telemetry.addData("Negative Limit", neg_limit);
-                telemetry.addData("Positive Limit", pos_limit);
-                telemetry.addData("LIMIT: ", armLiftRight.getTargetPosition());
                 return output;
         }
         return output;
     }
+
     //328,358
     public boolean Canextendleft() {
         boolean output = false;
@@ -227,25 +232,24 @@ public class Linear_recode extends LinearOpMode {
                 Move if Input = -1 and neglimit < linear pos
                  */
                 // if lin pos is less than equal to limit it runs func to check if it moves or not
-                if (round(gamepad2.right_stick_x) <= 0.1 &&  pos_limit > linear_pos) {
+                if (round(gamepad2.left_stick_x) >= 0.1 && pos_limit > linear_pos) {
                     output = true;
                     // implementing PID code to see if it works. at time of writing driver hub is dead and cant test
-                    armLiftLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    while (!onTarget)
-                    {
+                    //armLiftLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                   /* while (!onTarget) {
                         int error = target - armLiftLeft.getCurrentPosition();
                         // find what our Kp value will be through testing
-                        armLiftLeft.setPower(Range.clip(error*2, -1.0, 1.0));
+                        armLiftLeft.setPower(Range.clip(error * 2, -1.0, 1.0));
                         onTarget = Math.abs(error) <= tolerance;
-                    }
+                    }*/
                     armLiftLeft.setPower(1);
                     armLiftLeft.setTargetPosition(328);
                     telemetry.addLine("moving to left position");
-                } else if (round(gamepad2.right_stick_x) >= -0.1 && neg_limit < linear_pos) {
+                } else if (round(gamepad2.left_stick_x) <= -0.1 && neg_limit < linear_pos) {
                     output = true;
                     armLiftLeft.setTargetPosition(0);
                     telemetry.addLine("moving to zero left position");
-                }else if (round(gamepad2.right_stick_x) == 0 || neg_limit > linear_pos || pos_limit < linear_pos){
+                } else if (round(gamepad2.left_stick_x) == 0 || neg_limit > linear_pos || pos_limit < linear_pos) {
                     output = false;
                     armLiftLeft.setTargetPosition(armLiftLeft.getCurrentPosition());
                     telemetry.addLine("freezing");
@@ -262,14 +266,15 @@ public class Linear_recode extends LinearOpMode {
                 Move if Input = -1 and neglimit < linear pos
                  */
                 // if lin pos is less than equal to limit it runs func to check if it moves or not
-                if (round(gamepad2.right_stick_x) <= 0.1 &&  pos_limit > linear_pos) {
+                if (round(gamepad2.left_stick_x) >= 0.1 && pos_limit > linear_pos) {
                     output = true;
                     armLiftLeft.setTargetPosition(1408);
-                } else if (round(gamepad2.right_stick_x) >= -0.1 && neg_limit < linear_pos) {
+                } else if (round(gamepad2.left_stick_x) <= -0.1 && neg_limit < linear_pos) {
+                    telemetry.addLine("Left-Neg-Function");
                     output = true;
                     armLiftLeft.setTargetPosition(0);
 
-                }else if (round(gamepad2.right_stick_x) == 0 || neg_limit > linear_pos || pos_limit < linear_pos){
+                } else if (round(gamepad2.left_stick_x) == 0 || neg_limit > linear_pos || pos_limit < linear_pos) {
                     output = false;
                     armLiftLeft.setTargetPosition(armLiftLeft.getCurrentPosition());
                 }
@@ -278,6 +283,7 @@ public class Linear_recode extends LinearOpMode {
         }
         return output;
     }
+
     @Override
     public void runOpMode() throws InterruptedException {
         float forward;
@@ -318,7 +324,7 @@ public class Linear_recode extends LinearOpMode {
         armLiftRight.setPower(1);
         armLiftLeft.setPower(1);
         waitForStart();
-        while (opModeIsActive()){
+        while (opModeIsActive()) {
             if (gamepad2.a) {
                 Car_Lone = Extend_Preference.Dropoff1;
             } else if (gamepad2.b) {
@@ -339,7 +345,7 @@ public class Linear_recode extends LinearOpMode {
             } else if (gamepad2.b) {
                 Car_Lone = Extend_Preference.Dropoff2;
             }
-            telemetry.addData("TestSlide",testslide.getCurrentPosition());
+            telemetry.addData("TestSlide", testslide.getCurrentPosition());
             denominator = JavaUtil.maxOfList(JavaUtil.createListWith(1, Math.abs(forward) + strafe + turn));
             frontLeft.setPower((forward - (strafe + turn)) / denominator);
             backLeft.setPower((forward + (strafe - turn)) / denominator);
@@ -350,30 +356,51 @@ public class Linear_recode extends LinearOpMode {
                     testslide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     testslide.setPower(gamepad2.right_stick_x);
                     telemetry.addLine("IM TRYING TO COMMUNICATE");
-                    telemetry.addData("I AM AT ",testslide.getCurrentPosition());
+                    telemetry.addData("I AM AT ", testslide.getCurrentPosition());
                 } else {
                     testslide.setPower(0);
                 }
-            }else {
+            } else {
                 testslide.setPower(0);
             }
             if (Sticking_it_Y()) {
-                if (Canextendleft() && gamepad2.left_stick_x != 0){
-                    armLiftLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    armLiftLeft.setPower(gamepad2.left_stick_x);
-                }
 
-            }else {
+               if (Canextendleft() && gamepad2.left_stick_x != 0) {
+                   prop = Whichextend.Leftonly;
+               }
+               if (Canextendright() && gamepad2.left_stick_x != 0 && prop == Whichextend.Leftonly){
+                   prop = Whichextend.Both;
+               } else if (Canextendright() && gamepad2.left_stick_x != 0) {
+                   prop = Whichextend.Rightonly;
+               }
+               switch (prop){
+                   case Leftonly:
+                       armLiftLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                       armLiftLeft.setPower(-gamepad2.left_stick_x);
+                       telemetry.addLine("Left Only");
+                       telemetry.addData("Left Position", armLiftLeft.getCurrentPosition());
+                   case Rightonly:
+                       armLiftRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                       armLiftRight.setPower(gamepad2.left_stick_x);
+                       telemetry.addLine("Right Only");
+                       telemetry.addData("Right Position", armLiftRight.getCurrentPosition());
+                   case Both:
+                       armLiftLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                       armLiftRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                       armLiftLeft.setPower(-gamepad2.left_stick_x);
+                       armLiftRight.setPower(gamepad2.right_stick_x);
+                       telemetry.addLine("Both");
+                       telemetry.addData("Left Position", armLiftLeft.getCurrentPosition());
+                       telemetry.addData("Right Position", armLiftRight.getCurrentPosition());
+               }
+            } else {
                 armLiftLeft.setPower(0);
-            }}
-            if (Sticking_it_Y()) {
-                if (Canextendright() && gamepad2.left_stick_x != 0){
-                    armLiftRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    armLiftRight.setPower(gamepad2.left_stick_x);
-                }
+                armLiftRight.setPower(0);
             }
+        }
         telemetry.update();
         // Movement end
         // Claw Start
     }
+
 }
