@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.micah;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.*;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 
@@ -10,6 +11,7 @@ import static java.lang.Math.round;
 
 @TeleOp(name = "Yahoo")
 public class Linear_recode extends LinearOpMode {
+    public String[] telemetry_update = {};
     private DcMotor backRight;
     private DcMotor frontRight;
     private DcMotor armLiftLeft;
@@ -21,9 +23,20 @@ public class Linear_recode extends LinearOpMode {
     private DcMotor backLeft;
     private CRServo rollerIntakeLeft;
     private CRServo rollerIntakeRight;
+    ElapsedTime timer = new ElapsedTime();
     public Extend_Preference Car_Lone = Extend_Preference.Dropoff2;
     public Whichextend prop = Whichextend.Both;
 
+
+    public int error = 0;
+
+    public int friction = 0;
+    
+    public int sumoferrors = 0;
+
+    public int reference = 0;
+    public int integralsum = 0;
+    public int lasterror = 0;
 
     // Boolean to determine if you can extend, found this out during pep rally
     public enum Extend_Preference {
@@ -72,14 +85,14 @@ public class Linear_recode extends LinearOpMode {
         double linear_pos = testslide.getCurrentPosition();
         double pos_limit = 0;
         int neg_limit;
-        telemetry.addLine("IM COMPARING");
+        telemetry_update[0] = "IM COMPARING";
         // Declares Output before function runs
         switch (Car_Lone) {
             // Executed if Case is Hang 1
 
             case Dropoff2:
                 // Executed if Case is Hang 2
-                telemetry.addLine("HANG 2");
+                telemetry_update[1] = "HANG 2";
                 neg_limit = hangvalues[5];
 
                 /*
@@ -100,7 +113,8 @@ public class Linear_recode extends LinearOpMode {
                     testslide.setTargetPosition(testslide.getCurrentPosition());
                 }
 
-                telemetry.addData("Output: ", output);
+
+
                 telemetry.addData("Linear Pos: ", linear_pos);
                 telemetry.addData("Negative Limit", neg_limit);
                 telemetry.addData("Positive Limit", pos_limit);
@@ -236,12 +250,13 @@ public class Linear_recode extends LinearOpMode {
                     output = true;
                     // implementing PID code to see if it works. at time of writing driver hub is dead and cant test
                     //armLiftLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                   /* while (!onTarget) {
+                    //https://www.ctrlaltftc.com/the-pid-controller
+                    while (!onTarget) {
                         int error = target - armLiftLeft.getCurrentPosition();
                         // find what our Kp value will be through testing
                         armLiftLeft.setPower(Range.clip(error * 2, -1.0, 1.0));
                         onTarget = Math.abs(error) <= tolerance;
-                    }*/
+                    }
                     armLiftLeft.setPower(1);
                     armLiftLeft.setTargetPosition(328);
                     telemetry.addLine("moving to left position");
@@ -283,6 +298,31 @@ public class Linear_recode extends LinearOpMode {
         }
         return output;
     }
+
+
+    public void motormovelogic(Whichextend prop) {
+        switch (this.prop) {
+            case Leftonly:
+                armLiftLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armLiftLeft.setPower(-gamepad2.left_stick_x);
+                telemetry.addLine("Left Only");
+                telemetry.addData("Left Position", armLiftLeft.getCurrentPosition());
+            case Rightonly:
+                armLiftRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armLiftRight.setPower(gamepad2.left_stick_x);
+                telemetry.addLine("Right Only");
+                telemetry.addData("Right Position", armLiftRight.getCurrentPosition());
+            case Both:
+                armLiftLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armLiftRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armLiftLeft.setPower(-gamepad2.left_stick_x);
+                armLiftRight.setPower(gamepad2.right_stick_x);
+                telemetry.addLine("Both");
+                telemetry.addData("Left Position", armLiftLeft.getCurrentPosition());
+                telemetry.addData("Right Position", armLiftRight.getCurrentPosition());
+        }
+    }
+
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -364,6 +404,20 @@ public class Linear_recode extends LinearOpMode {
                 testslide.setPower(0);
             }
             if (Sticking_it_Y()) {
+                while (armLiftLeft.getCurrentPosition() != armLiftLeft.getTargetPosition()) {
+                    int target_position = 0;
+                    switch (Car_Lone){
+                        case Dropoff1:
+                            target_position = 358;
+                        case Dropoff2:
+                            target_position = 1408;
+                    }
+
+                    int encoderpos = armLiftLeft.getTargetPosition();
+                    error = target_position - encoderpos;
+                }
+
+
 
                if (Canextendleft() && gamepad2.left_stick_x != 0) {
                    prop = Whichextend.Leftonly;
@@ -372,35 +426,16 @@ public class Linear_recode extends LinearOpMode {
                    prop = Whichextend.Both;
                } else if (Canextendright() && gamepad2.left_stick_x != 0) {
                    prop = Whichextend.Rightonly;
+               } else {
+                   armLiftLeft.setPower(0);
+                   armLiftRight.setPower(0);
                }
-               switch (prop){
-                   case Leftonly:
-                       armLiftLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                       armLiftLeft.setPower(-gamepad2.left_stick_x);
-                       telemetry.addLine("Left Only");
-                       telemetry.addData("Left Position", armLiftLeft.getCurrentPosition());
-                   case Rightonly:
-                       armLiftRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                       armLiftRight.setPower(gamepad2.left_stick_x);
-                       telemetry.addLine("Right Only");
-                       telemetry.addData("Right Position", armLiftRight.getCurrentPosition());
-                   case Both:
-                       armLiftLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                       armLiftRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                       armLiftLeft.setPower(-gamepad2.left_stick_x);
-                       armLiftRight.setPower(gamepad2.right_stick_x);
-                       telemetry.addLine("Both");
-                       telemetry.addData("Left Position", armLiftLeft.getCurrentPosition());
-                       telemetry.addData("Right Position", armLiftRight.getCurrentPosition());
-               }
-            } else {
-                armLiftLeft.setPower(0);
-                armLiftRight.setPower(0);
-            }
+               motormovelogic(prop);
+
         }
         telemetry.update();
         // Movement end
         // Claw Start
     }
 
-}
+}}
